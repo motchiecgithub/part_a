@@ -7,10 +7,17 @@ MAX_DISTANCE = 12
 MAX_HEURISTIC = 50
 HEX_NEIGHBORS = [(0,1), (-1,1), (-1, 0), (0, -1), (1, -1), (1,0)]
 def linear_distance(goal, start):
+    """
+    this is support function for calculating distance between 2 points
+    in the board using hex grid distance function
+    """
     distance = max(abs(goal[0] - start[0]), abs(goal[1] - start[1]), abs(goal[0] + goal[1] - start[0] - start[1]))
     return distance
 
 def distance(goal: tuple, point: tuple):
+    """
+    calculate distance between starting point and goal point 
+    """
     min_distance = MAX_DISTANCE
     for i in [-7, 0, 7]:
         for j in [-7, 0, 7]:
@@ -26,6 +33,9 @@ def heuristic(start, goals):
     return result
 
 def expand(start, power):
+    """
+    calculate all possible neighbors of start point 
+    """
     result = [] 
     for item in HEX_NEIGHBORS:
         children = []
@@ -33,13 +43,6 @@ def expand(start, power):
             children.append(((start[0] + item[0] * i) % 7, (start[1] + item[1] * i) % 7))
         result.append(children)
     return result
-
-def track(parent, node):
-    result = []
-    while parent.get(node):
-        result.append(parent.get(node))
-        node = parent[node]
-    return result 
 
 def search(input: dict[tuple, tuple]) -> list[tuple]:
     """
@@ -57,15 +60,14 @@ def search(input: dict[tuple, tuple]) -> list[tuple]:
     
     reds = {}
     blues = {}
-    parent = {}
-    cost = {}
+
+    # separate reds and blues
     for item in input:
         if input[item][0] == 'b':
             blues[item] = input[item]
         else:
             reds[item] = input[item]
             parent[item] = None
-            cost[item] = 0
     
     open_lst = PriorityQueue()
     for red in reds:
@@ -107,12 +109,11 @@ def search(input: dict[tuple, tuple]) -> list[tuple]:
         # update reds 
         for item in next_move:
             if blues.get(item):
-                test = blues.pop(item)
-                if test[1] != 6:
-                    reds[item] = ('r', 1 + test[1])
+                point = blues.pop(item)
+                if point[1] != 6:
+                    reds[item] = ('r', 1 + point[1])
             else: 
                 reds[item] = ('r', 1)
-            parent[item] = curr[1]
             open_lst.put((heuristic(item, blues), item))
         direction.append(HEX_NEIGHBORS[neighbors.index(next_move)])
     result = []
