@@ -67,7 +67,6 @@ def search(input: dict[tuple, tuple]) -> list[tuple]:
             blues[item] = input[item]
         else:
             reds[item] = input[item]
-            parent[item] = None
     
     open_lst = PriorityQueue()
     for red in reds:
